@@ -26,16 +26,23 @@ from time import sleep as zzz
 
 from comands import ALPHABET
 
-
+Q = []
 
 
 
 with HomeMephiDB(database="HomeMephi") as db:
     
     #students and groups
-    '''group_ids = hmp.parse_Groups(hmp.ping_Groups())
+    group_ids = hmp.parse_Groups(hmp.ping_Groups())
+    group_exist_ids = db.get(table="StudyGroups", column = 'id')
     for i in group_ids.keys():
         print(group_ids[i],i)
+        
+        #if group exists
+        #from db it gets as [<ID>, <ID>...], so
+        if group_ids[i] in group_exist_ids:
+            continue
+        
         db.add_Group(group_ids[i], i)
         
         students = hmp.parse_Users_per_Group(hmp.ping_Users_per_Group(group_ids[i]))
@@ -46,26 +53,33 @@ with HomeMephiDB(database="HomeMephi") as db:
             elif i[0] == "М":date -= 18+4+1
             else: date -= 18+1
             bd = f_gen.date_between(d(date,1,1), d(date+2,1,1))
-            #print(st_id, students[st_id])
+            
+            print(st_id, students[st_id])
+            
             db.add_Student(st_id, students[st_id], bd)
             db.add_Student_to_Group(st_id, group_ids[i])
-        zzz(1.2+ri())
+        #commit per group
+        db.commit()
+        zzz(2+2*ri())
         #break
     #im tired to rollback every time it drops so
-    db.commit()'''
+    
     for letter in ALPHABET:
         teachers = hmp.parse_Teachers(hmp.ping_Teachers(letter))
         
         for schedule_id in teachers.keys():
             
             t_id, page = hmp.ping_Teacher(schedule_id)
+            if t_id == -1:#no teacher page:
+                continue
             kaf, work_from = hmp.parse_Teacher(page)
             bd = f_gen.date_between(d(work_from-55,1,1), d(work_from-25,1,1))
             
-            #print(t_id, teachers[schedule_id],kaf, work_from)
+            print(t_id, teachers[schedule_id],kaf, work_from)
             db.add_Teacher(t_id, teachers[schedule_id], bd)
-            zzz(1+ri())
-    db.commit()
+            zzz(2+2*ri())
+        #commit per letter
+        db.commit()
     
     
     

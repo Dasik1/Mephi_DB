@@ -36,10 +36,10 @@ CREATE TABLE IF NOT EXISTS StudyGroups ( --parser DONE
 
 ---to enter 3d normal form
 CREATE TABLE IF NOT EXISTS GroupStudents( --parser DONE
-    student_id INT UNIQUE NOT NULL,
+    student_id INT NOT NULL,
     FOREIGN KEY (student_id) REFERENCES Students (user_id) ON DELETE CASCADE,
     group_id INT NOT NULL,
-    FOREIGN KEY (group_id) REFERENCES StudyGroups (id) ON DELETE SET NULL 
+    FOREIGN KEY (group_id) REFERENCES StudyGroups (id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS Teachers (

@@ -11,7 +11,7 @@ in Tims II Lab
 
 
 from selenium import webdriver
-from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
 import re
 from bs4 import BeautifulSoup as bs
 from datetime import date as d
@@ -22,7 +22,12 @@ from time import sleep as zzz
 
 class HomeMephiParser:
     def __init__(self):
-        self.driver = webdriver.Firefox()
+        
+        options = Options()
+        # options.page_load_strategy = 'none'
+        options.page_load_strategy = 'eager'
+        # options.page_load_strategy = 'normal'
+        self.driver = webdriver.Firefox(options=options)
             
     
     def login(self, username, password):
@@ -49,7 +54,7 @@ class HomeMephiParser:
         group_links = {}
         for page in pages:
             for i in re.findall('\d{5}/schedule">\w\d{2}-\d{3}',page):
-                group_links[i[-7:]] = i[:5]
+                group_links[i[-7:]] = int(i[:5])
         return group_links
     
     
@@ -71,7 +76,7 @@ class HomeMephiParser:
         #in here re cant solve it (it breaks on letter seq) so here it comes - BS
         s = bs(page,"html.parser")
         lines = s.findAll('div', attrs={'class' : 'list-group-item'})
-        if lines == []:print("\n\nFORBIDEN--ERROR\n\n")
+        if lines == []:print("No Users - No horny")
         for student in lines:
             
             link = student.find('a')
@@ -115,7 +120,9 @@ class HomeMephiParser:
         
         
         s = bs(schedule,"html.parser")
-        link = s.findAll('h1', attrs={'class' : 'light'})[0].find("a")["href"]
+        link = s.findAll('h1', attrs={'class' : 'light'})[0].find("a")
+        if link is None: return -1, ''
+        link = link["href"]
         ID = re.findall('\d+',link)[0]
         
         

@@ -59,7 +59,24 @@ class HomeMephiDB:
     def commit(self):
         self.conn.commit()
     
+    
+    def get(self, table, column = '*', key=None):
+        if type(column) is not list:
+            column = [column]
+            comb = True
+        
+        if key is None:
+            key = ''
+        else:
+            key = f" WHERE {key['name']} = {key['val']}"
+        ans = self.execute(f"SELECT ({', '.join(column)}) FROM {table}{key}", "all")
+        if comb:
+            ans = list(map(lambda x:x[0], ans))
+        return ans
+    
     def add_User(self, ID, name, bd, pw = None, em = None, ph = None, ii = None, kaf = "22"):
+        
+        #no check because we dont add only user its only student or teacher
         
         sn = name["second"]#f
         fn = name["first"] #i
@@ -85,6 +102,12 @@ class HomeMephiDB:
         
     
     def add_Student(self, ID, name, bd, pw = None, em = None, ph = None, ii = None, kaf = "22"):
+        exist = self.get(table="Students",
+                         column="id",
+                         key={'name':"user_id",'val':ID})
+        
+        if exist: return ID
+        
         UID = self.add_User(ID, name, bd, pw, em, ph, ii)
         self.execute(f"INSERT INTO Students (user_id) VALUES ({UID}) RETURNING id")
     
@@ -99,5 +122,11 @@ class HomeMephiDB:
     
     
     def add_Teacher(self, ID, name, bd, pw = None, em = None, ph = None, ii = None, kaf = "22"):
+        exist = self.get(table="Teachers",
+                         column="id",
+                         key={'name':"user_id",'val':ID})
+        
+        if exist: return ID
+        
         UID = self.add_User(ID, name, bd, pw, em, ph, ii)
         self.execute(f"INSERT INTO Teachers (user_id, department) VALUES ({UID}, {kaf}) RETURNING id")
