@@ -117,7 +117,7 @@ class HomeMephiParser:
             else:
                 break
         
-        
+        zzz(1)
         
         s = bs(schedule,"html.parser")
         link = s.findAll('h1', attrs={'class' : 'light'})[0].find("a")
@@ -140,7 +140,11 @@ class HomeMephiParser:
         #those who wrote home mephi must kill themselves
         #even re cant hold that theq pooped....
         s = bs(page,"html.parser")
-        kaf = s.find('div', attrs={'class' : 'text-muted'}).find("small").text
+        kaf = s.find('div', attrs={'class' : 'text-muted'})
+        if kaf is None:
+            return None, None
+            
+        kaf = kaf.find("small").text
         kaf = re.findall('\d+',kaf)
         if kaf == []:kaf = -1
         else: kaf = kaf[0]

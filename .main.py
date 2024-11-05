@@ -63,20 +63,28 @@ with HomeMephiDB(database="HomeMephi") as db:
         zzz(2+2*ri())
         #break
     #im tired to rollback every time it drops so
-    
+    done = ["А","Б","В"]
     for letter in ALPHABET:
+        if letter in done:
+            continue
         teachers = hmp.parse_Teachers(hmp.ping_Teachers(letter))
         
         for schedule_id in teachers.keys():
+            #I dont think optimization is not so easy and memory-free so
+            #check only in db.add
             
             t_id, page = hmp.ping_Teacher(schedule_id)
             if t_id == -1:#no teacher page:
                 continue
+            
             kaf, work_from = hmp.parse_Teacher(page)
+            if kaf is None:#Андронов
+                continue
+                
             bd = f_gen.date_between(d(work_from-55,1,1), d(work_from-25,1,1))
             
             print(t_id, teachers[schedule_id],kaf, work_from)
-            db.add_Teacher(t_id, teachers[schedule_id], bd)
+            db.add_Teacher(t_id, teachers[schedule_id], bd, kaf=kaf, wf = bd)
             zzz(2+2*ri())
         #commit per letter
         db.commit()

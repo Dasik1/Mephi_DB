@@ -12,6 +12,7 @@ in Tims II Lab
 
 import psycopg2 as sql
 from comands import users_param
+from datetime import date as d
 
 class HomeMephiDB:  
     
@@ -77,6 +78,12 @@ class HomeMephiDB:
     def add_User(self, ID, name, bd, pw = None, em = None, ph = None, ii = None, kaf = "22"):
         
         #no check because we dont add only user its only student or teacher
+        #как же я блять ошибался
+        exist = self.get(table="Users",
+                         column="id",
+                         key={'name':"id",'val':ID})
+        
+        if exist: return ID
         
         sn = name["second"]#f
         fn = name["first"] #i
@@ -121,7 +128,7 @@ class HomeMephiDB:
     
     
     
-    def add_Teacher(self, ID, name, bd, pw = None, em = None, ph = None, ii = None, kaf = "22"):
+    def add_Teacher(self, ID, name, bd, pw = None, em = None, ph = None, ii = None, kaf = "22", wf=d(2024,9,1)):
         exist = self.get(table="Teachers",
                          column="id",
                          key={'name':"user_id",'val':ID})
@@ -129,4 +136,4 @@ class HomeMephiDB:
         if exist: return ID
         
         UID = self.add_User(ID, name, bd, pw, em, ph, ii)
-        self.execute(f"INSERT INTO Teachers (user_id, department) VALUES ({UID}, {kaf}) RETURNING id")
+        self.execute(f"INSERT INTO Teachers (user_id, department, work_from) VALUES ({UID}, {kaf}, '{wf}') RETURNING id")
