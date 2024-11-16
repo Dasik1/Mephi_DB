@@ -159,30 +159,36 @@ class HomeMephiDB:
         
         #u should follow rules
         #get out of here
-        print([name])
+        
+        #print([name]) <- he is gay
+        
         #raise Exception("Get teacher with not valid ")
         return None, None
     
     
     
     def add_Subject(self, name, department):
+        if len(name)>150:return None
+        
         exist = self.get(table="Subjects",
                          column=["id", "department"],
                          key={'name':"name",'val':f"'{name}'"})
         
-        
         if exist:
-            if len(exist)>1:
+            if len(exist)>0:
                 ID, kaf = 0, -1
                 for i in exist:
                     nID, nkaf = eval(i[0])
-                    if nkaf>kaf and kaf == -1:
+                    if nkaf>=kaf and kaf == -1:
                         ID = nID
                         kaf = nkaf
                 if kaf < department:
                     print(f"update {name} to {department}")
-                    return self.execute(f"UPDATE Subjects SET department={department} WHERE id={ID} RETURNING id")[0]
-        return self.execute(f"INSERT INTO Subjects (name, department) VALUES ('{name}', {department}) RETURNING id")[0]
+                    self.execute(f"UPDATE Subjects SET department={department} WHERE id={ID} RETURNING id")
+                    return ID
+                return max(ID, nID)
+        else:
+            return self.execute(f"INSERT INTO Subjects (name, department) VALUES ('{name}', {department}) RETURNING id")[0]
     
     
     def get_learning_groups(self):
@@ -198,6 +204,7 @@ class HomeMephiDB:
                          key={'name':"name",'val':f"'{name}'"})
         
         if exist: return exist[0]
+        if len(name) >10:return None
         return self.execute(f"INSERT INTO Audiences (name) VALUEs ('{name}') RETURNING id")[0]
     
     def add_TeachingSubject(self, t_id, l_id):

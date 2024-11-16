@@ -36,27 +36,27 @@ with HomeMephiDB(database="HomeMephi") as db:
     group_parced_ids = db.get_learning_groups()
     print(group_parced_ids)
     for g_id in group_ids:
-        if g_id in group_parced_ids:
-            print(g_id)
-            continue
-        
+        if g_id in group_parced_ids:continue
+        print(g_id)
         lessons = hmp.parse_Shedule(hmp.ping_Shedule(g_id))
         
         for lesson in lessons:
             for teacher in lesson["teachers"]:
                 #lesson:{'name':, 'weekday':, 'start_time':, 'location':,'teachers':<iter>, 'group':}
-                
+                a_id = db.add_Audience(lesson["location"])
+                if a_id is None:continue
                 
                 
                 #get kaf
                 kaf, t_id = db.get_Teacher(teacher)
                 if t_id is None:continue
                 l_id = db.add_Subject(lesson["name"], kaf)
+                if l_id is None:continue
                 
                 db.add_TeachingSubject(t_id, l_id)
                 db.add_StudyingSubject(g_id, l_id)
                 
-                a_id = db.add_Audience(lesson["location"])
+                
                 
                 #now we are ready for shedule
                 db.add_Shedule(l_id, t_id, g_id, a_id, lesson["weekday"],lesson["start_time"])
@@ -83,8 +83,6 @@ with HomeMephiDB(database="HomeMephi") as db:
         #commit per group
         db.commit()
         zzz(2*r())
-        
-    pass
 
 
 

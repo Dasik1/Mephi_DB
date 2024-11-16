@@ -207,6 +207,7 @@ class HomeMephiParser:
             
             if "Перенос" in summary:continue
             if "Физическая культура" in summary:continue
+            if "Консультация" in summary:continue
             if "Проектная практика" in summary:summary = 'Проектная практика'
             
 
@@ -216,11 +217,16 @@ class HomeMephiParser:
             start = start.strftime("%H:%M")
 
             # Get the location of the event
+            if 'LOCATION' not in event.keys():continue
             location = event['LOCATION']
             
 
             # Get the description of the event
-            teachers, group = event['DESCRIPTION'].split(". ")
+            if 'DESCRIPTION' not in event.keys():continue
+            
+            t_g = event['DESCRIPTION'].split(". ")
+            if len(t_g)==1:continue
+            teachers, group = t_g
             teachers = (teachers+".").replace(" ",'').split(",")
             #и если вдруг
             #какаято мразб
