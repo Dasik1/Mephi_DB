@@ -26,7 +26,7 @@ from time import sleep as zzz
 
 from comands import ALPHABET
 
-Q = []
+
 
 
 

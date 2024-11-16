@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS GroupStudents( --parser DONE
     FOREIGN KEY (group_id) REFERENCES StudyGroups (id) ON DELETE SET NULL
 );
 
-CREATE TABLE IF NOT EXISTS Teachers (
+CREATE TABLE IF NOT EXISTS Teachers ( --parser DONE
     id SERIAL PRIMARY KEY,
     user_id INT UNIQUE NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE CASCADE,
@@ -52,33 +52,17 @@ CREATE TABLE IF NOT EXISTS Teachers (
 
 CREATE TABLE IF NOT EXISTS Subjects (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
+    name VARCHAR(150) NOT NULL,
     department INTEGER NOT NULL,
-    total_hours INTEGER NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS TeachingSubject (
-    id SERIAL PRIMARY KEY,
-    teacher_id INT NOT NULL,
-    FOREIGN KEY (teacher_id) REFERENCES Teachers (user_id) ON DELETE CASCADE,
-    subject_id INT NOT NULL,
-    FOREIGN KEY (subject_id) REFERENCES Subjects (id) ON DELETE CASCADE,
-    workload INT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS StudyingSubject (
-    id SERIAL PRIMARY KEY,
-    teacher_id INT NOT NULL,
-    FOREIGN KEY (teacher_id) REFERENCES Teachers (user_id) ON DELETE CASCADE,
-    group_id INT NOT NULL,
-    FOREIGN KEY (group_id) REFERENCES StudyGroups (id) ON DELETE CASCADE
+    total_hours INTEGER
+	
 );
 
 CREATE TABLE IF NOT EXISTS Marks (
     id SERIAL PRIMARY KEY,
     subject_id INT NOT NULL,
     FOREIGN KEY (subject_id) REFERENCES Subjects (id) ON DELETE CASCADE,
-    grade_type MARK_TYPE NOT NULL,
+    grade_type MARK_TYPE,
     grade_val SMALLINT NOT NULL,
     grade_ECTS MARK_ECTS
 );
@@ -91,7 +75,7 @@ CREATE TABLE IF NOT EXISTS StudentMarks (
     FOREIGN KEY (mark_id) REFERENCES Marks (id) ON DELETE RESTRICT,
     teacher_id INT NOT NULL,
     FOREIGN KEY (teacher_id) REFERENCES Teachers (user_id) ON DELETE CASCADE,
-    mark_date DATE
+    mark_date DATE NOT NULL
 );
 
 
@@ -99,50 +83,46 @@ CREATE TABLE IF NOT EXISTS StudentMarks (
 
 CREATE TABLE IF NOT EXISTS Audiences (
     id SERIAL PRIMARY KEY,
-    building BUILDING_TYPE NOT NULL,
-    floor SMALLINT NOT NULL,
-    numder SMALLINT NOT NULL,
 
-    capacity INTEGER NOT NULL
+	name VARCHAR(10) NOT NULL UNIQUE,
+	
+    building BUILDING_TYPE,
+    floor SMALLINT,
+    numder SMALLINT,
+
+    capacity INTEGER
     ---equipment in PRO version)---
 );
 
 ---shedule---
-CREATE TABLE IF NOT EXISTS Lessons (
-    id SERIAL PRIMARY KEY,
-    start_time TIME NOT NULL,
-    end_time TIME NOT NULL,
-    lesson_date DATE NOT NULL,
-    subject_id INTEGER NOT NULL,
-    FOREIGN KEY (subject_id) REFERENCES Subjects (id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS TeachingLessons (
+CREATE TABLE IF NOT EXISTS TeachingSubject (
     id SERIAL PRIMARY KEY,
     teacher_id INT NOT NULL,
     FOREIGN KEY (teacher_id) REFERENCES Teachers (user_id) ON DELETE CASCADE,
-    lesson_id INT NOT NULL,
-    FOREIGN KEY (lesson_id) REFERENCES Lessons (id) ON DELETE CASCADE
+    subject_id INT NOT NULL,
+    FOREIGN KEY (subject_id) REFERENCES Subjects (id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS StudyingLessons (
+CREATE TABLE IF NOT EXISTS StudyingSubject (
     id SERIAL PRIMARY KEY,
-    group_id INT NOT NULL,
+	group_id INT NOT NULL,
     FOREIGN KEY (group_id) REFERENCES StudyGroups (id) ON DELETE CASCADE,
-    lesson_id INT NOT NULL,
-    FOREIGN KEY (lesson_id) REFERENCES Lessons (id) ON DELETE CASCADE
+	subject_id INT NOT NULL,
+    FOREIGN KEY (subject_id) REFERENCES Subjects (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Shedule (
     id SERIAL PRIMARY KEY,
-    lesson_id INTEGER NOT NULL,
-    FOREIGN KEY (lesson_id) REFERENCES Lessons (id) ON DELETE CASCADE,
+    subject_id INTEGER NOT NULL,
+    FOREIGN KEY (subject_id) REFERENCES Subjects (id) ON DELETE CASCADE,
     teacher_id INTEGER NOT NULL,
     FOREIGN KEY (teacher_id) REFERENCES Teachers (user_id) ON DELETE CASCADE,
     group_id INTEGER NOT NULL,
     FOREIGN KEY (group_id) REFERENCES StudyGroups (id) ON DELETE CASCADE,
     audience_id INTEGER NOT NULL,
-    FOREIGN KEY (audience_id) REFERENCES Audiences (id) ON DELETE CASCADE
+    FOREIGN KEY (audience_id) REFERENCES Audiences (id) ON DELETE CASCADE,
+	week_day DAY_TYPE NOT NULL,
+	time_start TIME NOT NULL
 );
 
 ---other other (perfect joke)---

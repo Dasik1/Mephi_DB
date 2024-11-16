@@ -11,7 +11,11 @@ in Tims II Lab
 
 
 import psycopg2 as sql
-from comands import users_param
+from comands import(
+    users_param,
+    Teacher_from_FIO,
+    Students_from_Group
+)
 from datetime import date as d
 
 class HomeMephiDB:  
@@ -62,7 +66,8 @@ class HomeMephiDB:
     
     
     def get(self, table, column = '*', key=None):
-        if type(column) is not list:
+        comb = False
+        if type(column) is not list and column != '*':
             column = [column]
             comb = True
         
@@ -137,3 +142,82 @@ class HomeMephiDB:
         
         UID = self.add_User(ID, name, bd, pw, em, ph, ii)
         self.execute(f"INSERT INTO Teachers (user_id, department, work_from) VALUES ({UID}, {kaf}, '{wf}') RETURNING id")
+    
+    
+    def get_Teacher(self, name):
+        """format = Fam I.O"""
+        
+        f, n_o = name.split('\xa0')#I hate home mephi authors
+        var = self.execute(Teacher_from_FIO + f"'{f}'", "all")
+        if n_o.count(".") == 1: n_o = n_o[0]+"-"
+        elif n_o.count(".") == 2: n_o = n_o[0]+n_o[2]
+        #else it skips the loop
+        
+        for i in var:
+            if i[1][0]+i[2][0] == n_o:
+                return i[3], i[4] #department, id
+        
+        #u should follow rules
+        #get out of here
+        print([name])
+        #raise Exception("Get teacher with not valid ")
+        return None, None
+    
+    
+    
+    def add_Subject(self, name, department):
+        exist = self.get(table="Subjects",
+                         column=["id", "department"],
+                         key={'name':"name",'val':f"'{name}'"})
+        
+        
+        if exist:
+            if len(exist)>1:
+                ID, kaf = 0, -1
+                for i in exist:
+                    nID, nkaf = eval(i[0])
+                    if nkaf>kaf and kaf == -1:
+                        ID = nID
+                        kaf = nkaf
+                if kaf < department:
+                    print(f"update {name} to {department}")
+                    return self.execute(f"UPDATE Subjects SET department={department} WHERE id={ID} RETURNING id")[0]
+        return self.execute(f"INSERT INTO Subjects (name, department) VALUES ('{name}', {department}) RETURNING id")[0]
+    
+    
+    def get_learning_groups(self):
+        ans = self.execute("SELECT Group_id FROM StudyingSubject GROUP BY Group_id", "all")
+        return list(map(lambda x: x[0], ans))
+        
+    
+    
+    
+    def add_Audience(self, name):
+        exist = self.get(table="Audiences",
+                         column="id",
+                         key={'name':"name",'val':f"'{name}'"})
+        
+        if exist: return exist[0]
+        return self.execute(f"INSERT INTO Audiences (name) VALUEs ('{name}') RETURNING id")[0]
+    
+    def add_TeachingSubject(self, t_id, l_id):
+        return self.execute(f"INSERT INTO TeachingSubject (teacher_id, subject_id) VALUES ({t_id}, {l_id}) RETURNING id")[0]
+    
+    def add_StudyingSubject(self, g_id, l_id):
+        return self.execute(f"INSERT INTO StudyingSubject (group_id, subject_id) VALUES ({g_id}, {l_id}) RETURNING id")[0]
+    
+    
+    def get_Students_from_Group(self, group_id):
+        return self.execute(Students_from_Group + str(group_id) , "all")
+    
+    def add_Shedule(self, l_id, t_id, g_id, a_id, weekday, time):
+        return self.execute(f"INSERT INTO Shedule (subject_id, teacher_id, group_id, audience_id, week_day, time_start) VALUES ({l_id}, {t_id}, {g_id}, {a_id}, '{weekday}', '{time}') RETURNING id")[0]
+    
+    
+    def add_Mark(self, s_id, grade):
+        return self.execute(f"INSERT INTO Marks (subject_id, grade_val) VALUES ({s_id}, {grade}) RETURNING id")[0]
+    
+    
+    def add_Student_Mark(self, s_id, m_id, t_id, date):
+        return self.execute(f"INSERT INTO StudentMarks (student_id, mark_id, teacher_id, mark_date) VALUES ({s_id}, {m_id}, {t_id}, '{date}') RETURNING id")
+    

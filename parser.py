@@ -18,15 +18,17 @@ from datetime import date as d
 from time import time
 from time import sleep as zzz
 
+import requests as rq
+
+from icalendar import Calendar as C
+from comands import WEEKDAY
 
 
 class HomeMephiParser:
     def __init__(self):
         
         options = Options()
-        # options.page_load_strategy = 'none'
-        options.page_load_strategy = 'eager'
-        # options.page_load_strategy = 'normal'
+        options.page_load_strategy = 'eager' #/normal / none
         self.driver = webdriver.Firefox(options=options)
             
     
@@ -65,7 +67,7 @@ class HomeMephiParser:
             source = self.driver.page_source
             if source.find("Forbidden")>=0:
                 zzz(5)
-                print("FORBIDDEN - RETRY")
+                print("FORBIDDEN SRUDY GROUP - RETRY")
             else:
                 break
         return source
@@ -102,18 +104,18 @@ class HomeMephiParser:
             source = self.driver.page_source
             if source.find("Forbidden")>=0:
                 zzz(5)
-                print("FORBIDDEN - RETRY")
+                print("FORBIDDEN TUTOR LIST - RETRY")
             else:
                 break
         return source
     
     def ping_Teacher(self, sch_ID):
         while True:
-            self.driver.get(f"https://home.mephi.ru/tutors/{sch_ID}?locale=")
+            self.driver.get(f"https://home.mephi.ru/tutors/{sch_ID}")
             schedule = self.driver.page_source
             if schedule.find("Forbidden")>=0:
                 zzz(5)
-                print("FORBIDDEN - RETRY")
+                print("FORBIDDEN TUTOR - RETRY")
             else:
                 break
         
@@ -131,7 +133,7 @@ class HomeMephiParser:
             page = self.driver.page_source
             if page.find("Forbidden")>=0:
                 zzz(5)
-                print("FORBIDDEN - RETRY")
+                print("FORBIDDEN USER - RETRY")
             else:
                 break
         return ID, page
@@ -174,5 +176,62 @@ class HomeMephiParser:
             teachers[int(link)] = {"second":sn, "first":fn, "last":ln}
         
         return teachers
+    
+    def ping_Shedule(self, ID):
+        while True:
+            self.driver.get(f"https://home.mephi.ru/study_groups/{ID}/schedule")
+            #page = self.driver.page_source
+            
+            source = rq.get(f"https://home.mephi.ru/study_groups/{ID}/schedule.ics")
+            source.encoding = 'utf-8'
+            source = source.text
+            
+            if source.find("Forbidden")>=0:
+                zzz(5)
+                print("FORBIDDEN - RETRY")
+            else:
+                break
+        
+        return source
+    
+    
+    def parse_Shedule(self, ics):
+        lessons = []
+        
+        cal = C.from_ical(ics)
+        for event in cal.walk('VEVENT'):
+            
+            # Get the event summary
+            summary = event['SUMMARY'].split(';')[-1]
+            
+            
+            if "Перенос" in summary:continue
+            if "Физическая культура" in summary:continue
+            if "Проектная практика" in summary:summary = 'Проектная практика'
+            
 
+            # Get the event start and end dates
+            start = event['DTSTART'].dt
+            weekday = WEEKDAY[start.weekday()]
+            start = start.strftime("%H:%M")
 
+            # Get the location of the event
+            location = event['LOCATION']
+            
+
+            # Get the description of the event
+            teachers, group = event['DESCRIPTION'].split(". ")
+            teachers = (teachers+".").replace(" ",'').split(",")
+            #и если вдруг
+            #какаято мразб
+            #вдруг будет с пробелом.....
+            #с ноги вшатаю
+            
+            
+            
+            
+            lessons.append({'name': summary, 'weekday':weekday,'start_time': start, 'location': location,
+                            'teachers': teachers, 'group': group})
+            
+            
+        return lessons
