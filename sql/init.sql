@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS Teachers ( --parser DONE
     work_from DATE
 );
 
-CREATE TABLE IF NOT EXISTS Subjects (
+CREATE TABLE IF NOT EXISTS Subjects ( --parser DONE
     id SERIAL PRIMARY KEY,
     name VARCHAR(150) NOT NULL,
     department INTEGER NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS Subjects (
 	
 );
 
-CREATE TABLE IF NOT EXISTS Marks (
+CREATE TABLE IF NOT EXISTS Marks ( --parser DONE
     id SERIAL PRIMARY KEY,
     subject_id INT NOT NULL,
     FOREIGN KEY (subject_id) REFERENCES Subjects (id) ON DELETE CASCADE,
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS Marks (
     grade_ECTS MARK_ECTS
 );
 
-CREATE TABLE IF NOT EXISTS StudentMarks (
+CREATE TABLE IF NOT EXISTS StudentMarks ( --parser DONE
     id SERIAL PRIMARY KEY,
     student_id INT NOT NULL,
     FOREIGN KEY (student_id) REFERENCES Students (user_id) ON DELETE CASCADE,
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS StudentMarks (
 
 ---from other---
 
-CREATE TABLE IF NOT EXISTS Audiences (
+CREATE TABLE IF NOT EXISTS Audiences ( --parser DONE
     id SERIAL PRIMARY KEY,
 
 	name VARCHAR(10) NOT NULL UNIQUE,
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS Audiences (
 );
 
 ---shedule---
-CREATE TABLE IF NOT EXISTS TeachingSubject (
+CREATE TABLE IF NOT EXISTS TeachingSubject ( --parser DONE
     id SERIAL PRIMARY KEY,
     teacher_id INT NOT NULL,
     FOREIGN KEY (teacher_id) REFERENCES Teachers (user_id) ON DELETE CASCADE,
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS TeachingSubject (
     FOREIGN KEY (subject_id) REFERENCES Subjects (id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS StudyingSubject (
+CREATE TABLE IF NOT EXISTS StudyingSubject ( --parser DONE
     id SERIAL PRIMARY KEY,
 	group_id INT NOT NULL,
     FOREIGN KEY (group_id) REFERENCES StudyGroups (id) ON DELETE CASCADE,
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS StudyingSubject (
     FOREIGN KEY (subject_id) REFERENCES Subjects (id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS Shedule (
+CREATE TABLE IF NOT EXISTS Shedule ( --parser DONE
     id SERIAL PRIMARY KEY,
     subject_id INTEGER NOT NULL,
     FOREIGN KEY (subject_id) REFERENCES Subjects (id) ON DELETE CASCADE,

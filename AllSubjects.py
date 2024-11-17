@@ -73,19 +73,9 @@ with HomeMephiDB(database="HomeMephi") as db:
                     
                     date = f_gen.date_between(d(2024,12,20), d(2025,2,1))
                     db.add_Student_Mark(s_id[0], m_id, t_id, date)#third leg
-
-        
-        
-
-        
-        
         
         #commit per group
         db.commit()
         zzz(2*r())
-
-
-
-
 
 hmp.logout()

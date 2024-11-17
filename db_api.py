@@ -228,3 +228,11 @@ class HomeMephiDB:
     def add_Student_Mark(self, s_id, m_id, t_id, date):
         return self.execute(f"INSERT INTO StudentMarks (student_id, mark_id, teacher_id, mark_date) VALUES ({s_id}, {m_id}, {t_id}, '{date}') RETURNING id")
     
+    
+    
+    
+    def add_Serteficate_Request(self, u_id, data, date):
+        if len(data)>255:return None
+        return self.execute(f"INSERT INTO SerteficateOrders (user_id, order_data, order_date, order_result) VALUES ({u_id, '{data}'}, '{date}', 'Принят')")
+        
+    def set_Serteficate_Result(self,manual = True, **kwargs):pass
