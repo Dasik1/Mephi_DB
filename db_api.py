@@ -80,7 +80,7 @@ class HomeMephiDB:
             ans = list(map(lambda x:x[0], ans))
         return ans
     
-    def add_User(self, ID, name, bd, pw = None, em = None, ph = None, ii = None, kaf = "22"):
+    def add_User(self, ID, name, bd, pw = None, em = None, ph = None, ii = None):
         
         #no check because we dont add only user its only student or teacher
         #как же я блять ошибался
@@ -233,6 +233,38 @@ class HomeMephiDB:
     
     def add_Serteficate_Request(self, u_id, data, date):
         if len(data)>255:return None
-        return self.execute(f"INSERT INTO SerteficateOrders (user_id, order_data, order_date, order_result) VALUES ({u_id, '{data}'}, '{date}', 'Принят')")
+        return self.execute(f"INSERT INTO SerteficateOrders (user_id, order_data, order_date, order_result) VALUES ({u_id}, '{data}', '{date}', 'Принят') RETURNING id")[0]
         
-    def set_Serteficate_Result(self,manual = True, **kwargs):pass
+    def set_Serteficate_Result(self, ID, rez):
+        return self.execute(f"UPDATE SerteficateOrders SET order_result = '{rez}' WHERE id = {ID} RETURNING id")
+
+    def update_Serteficate_Result(self, date_approve, date_reg):
+        self.execute(f"UPDATE SerteficateOrders SET order_result = 'Выдан' WHERE order_date < {date_approve} RETURNING id")
+        self.execute(f"UPDATE SerteficateOrders SET order_result = 'В обработке' WHERE order_date < {date_reg} RETURNING id")
+        
+    
+    def add_Psycologist(self,u_id, about = 'Hi', **kwargs):
+        
+        if u_id < 0:
+            exist = False
+        else:
+            exist = self.get(table="Users",
+                         column="id",
+                         key={'name':"id",'val':u_id})
+        
+        if not exist:
+            u_id = self.add_User(u_id, kwargs["name"], kwargs["bd"])
+            
+        return self.execute(f"INSERT INTO Psycologists (user_id, about) VALUES ({u_id}, '{about}') RETURNING id")[0]
+        
+        
+    def add_PsycologistAppointmenr(self, u_id, p_id, date, time):
+        return self.execute(f"INSERT INTO PsycologistAppointment (user_id, psycologist_id, appointment_date, appointment_time) VALUES ({u_id}, {p_id}, '{date}', '{time}') RETURNING id")[0]
+        
+        
+        
+        
+        
+        
+        
+        

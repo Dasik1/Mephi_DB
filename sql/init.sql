@@ -185,14 +185,14 @@ CREATE TABLE IF NOT EXISTS ReviewConnections (
     FOREIGN KEY (subject_id) REFERENCES Subjects (id) on DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS Psycologists (
+CREATE TABLE IF NOT EXISTS Psycologists ( --parser DONE
     id SERIAL PRIMARY KEY,
     user_id INT UNIQUE NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE CASCADE,
     about TEXT
 );
 
-CREATE TABLE IF NOT EXISTS PsycologistAppointment (
+CREATE TABLE IF NOT EXISTS PsycologistAppointment ( --parser DONE
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE CASCADE,
@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS PsycologistAppointment (
     appointment_time TIME NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS SerteficateOrders (
+CREATE TABLE IF NOT EXISTS SerteficateOrders ( --parser DONE
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE CASCADE,
