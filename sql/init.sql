@@ -126,23 +126,23 @@ CREATE TABLE IF NOT EXISTS Shedule ( --parser DONE
 );
 
 ---other other (perfect joke)---
-CREATE TABLE IF NOT EXISTS OtherGroups (
+CREATE TABLE IF NOT EXISTS OtherGroups ( --parser DONE
     id SERIAL PRIMARY KEY,
     group_name VARCHAR(50) NOT NULL,
     group_type VARCHAR(30) NOT NULL,
-    head_id INT NOT NULL,
+    head_id INT,
     FOREIGN KEY (head_id) REFERENCES Users (id) ON DELETE SET NULL,
     creade_date DATE NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS OtherGroupMembers (
-    user_id INT UNIQUE NOT NULL,
+CREATE TABLE IF NOT EXISTS OtherGroupMembers ( --parser DONE
+    user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE CASCADE,
     group_id INT NOT NULL,
     FOREIGN KEY (group_id) REFERENCES OtherGroups (id) ON DELETE SET NULL 
 
 );
-
+/*
 CREATE TABLE IF NOT EXISTS Events (
     id SERIAL PRIMARY KEY,
     event_name VARCHAR(100),
@@ -159,31 +159,7 @@ CREATE TABLE IF NOT EXISTS GroupEvents (
     event_id INT NOT NULL,
     FOREIGN KEY (event_id) REFERENCES Events (id) ON DELETE CASCADE
 );
-
----services---
-CREATE TABLE IF NOT EXISTS Reviews (
-    id SERIAL PRIMARY KEY,
-    review_data VARCHAR(255) NOT NULL,
-    /*
-     review_data can be written as text f.e. "<smb> is great i love him</smb>"
-     or as a mark f.e. "working with students = 4"
-     to divide em new field need to be created
-    */
-    review_mark BOOLEAN NOT NULL, --if it is a <smb type mark> = <mark>
-    review_date DATE NOT NULL DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS ReviewConnections (
-    id SERIAL PRIMARY KEY,
-    review_id INT UNIQUE NOT NULL,
-    FOREIGN KEY (review_id) REFERENCES Reviews (id) on DELETE CASCADE,
-    teacher_id INT NOT NULL,
-    FOREIGN KEY (teacher_id) REFERENCES Teachers (user_id) on DELETE CASCADE,
-    user_id INT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Users (id) on DELETE CASCADE,
-    subject_id INT NOT NULL,
-    FOREIGN KEY (subject_id) REFERENCES Subjects (id) on DELETE CASCADE
-);
+*/
 
 CREATE TABLE IF NOT EXISTS Psycologists ( --parser DONE
     id SERIAL PRIMARY KEY,

@@ -263,8 +263,27 @@ class HomeMephiDB:
         
         
         
+    def add_OtherGroup(self, name, g_type, date, author= None):
+        if author is None:
+            return self.execute(f"INSERT INTO OtherGroups (group_name, group_type, creade_date) VALUES ('{name}', '{g_type}', '{date}') RETURNING id")[0]
+        return self.execute(f"INSERT INTO OtherGroups (group_name, group_type, head_id, creade_date) VALUES ('{name}', '{g_type}', {author}, '{date}') RETURNING id")[0]
         
         
-        
-        
+    def add_ToOtherGroup(self, u_id, g_id):
+        return self.execute(f"INSERT INTO OtherGroupMembers (user_id, group_id) VALUES ({u_id}, {g_id}) RETURNING user_id")[0]
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
         
